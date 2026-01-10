@@ -1,14 +1,13 @@
-// src/firebase/config.js
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDmVaGz7g13uGjxv40lB3_vWwXTbKd-kxo",
-  authDomain: "belen-a.firebaseapp.com",
-  projectId: "belen-a",
-  storageBucket: "belen-a.firebasestorage.app",
-  messagingSenderId: "938930241891",
-  appId: "1:938930241891:web:f816886be099158f6a9356"
+  apiKey: "AIzaSyCv4E7vr_hOKbBgTBS-z2oGo7i6T9ggJvE",
+  authDomain: "romi-7ccf5.firebaseapp.com",
+  projectId: "romi-7ccf5",
+  storageBucket: "romi-7ccf5.firebasestorage.app",
+  messagingSenderId: "966417260748",
+  appId: "1:966417260748:web:bbc41ca574ec8002b2e269"
 };
 
 const app = initializeApp(firebaseConfig);

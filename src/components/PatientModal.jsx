@@ -1,6 +1,5 @@
-// src/components/PatientModal.jsx
 import { useState, useEffect } from 'react';
-import { FiX, FiUser, FiCreditCard, FiPhone, FiFileText } from 'react-icons/fi';
+import { FiX, FiUser, FiCreditCard, FiPhone, FiFileText, FiCalendar, FiBriefcase } from 'react-icons/fi';
 
 export default function PatientModal({ darkMode, isOpen, onClose, onSave, patient }) {
   const [formData, setFormData] = useState({
@@ -9,11 +8,18 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
     phone: '',
     insurance: '',
     notes: '',
+    birthDate: '',
+    occupation: '',
   });
+
+  const [calculatedAge, setCalculatedAge] = useState(null);
 
   useEffect(() => {
     if (patient) {
       setFormData(patient);
+      if (patient.birthDate) {
+        calculateAge(patient.birthDate);
+      }
     } else {
       setFormData({
         name: '',
@@ -21,9 +27,30 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
         phone: '',
         insurance: '',
         notes: '',
+        birthDate: '',
+        occupation: '',
       });
+      setCalculatedAge(null);
     }
   }, [patient, isOpen]);
+
+  const calculateAge = (birthDate) => {
+    if (!birthDate) {
+      setCalculatedAge(null);
+      return;
+    }
+
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+
+    setCalculatedAge(age);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,6 +58,11 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
       ...prev,
       [name]: value,
     }));
+
+    // Calcular edad automáticamente cuando cambia la fecha de nacimiento
+    if (name === 'birthDate') {
+      calculateAge(value);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -39,7 +71,14 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
       alert('Por favor completa al menos el nombre y DNI');
       return;
     }
-    onSave(formData);
+    
+    // Incluir la edad calculada al guardar
+    const dataToSave = {
+      ...formData,
+      age: calculatedAge,
+    };
+    
+    onSave(dataToSave);
     onClose();
   };
 
@@ -57,7 +96,7 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <div className="p-6 space-y-4">
           {/* Nombre */}
           <div>
             <label className={`block text-sm font-medium mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -97,6 +136,63 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
                   : 'bg-white border-gray-300 text-gray-900'
               }`}
               required
+            />
+          </div>
+
+          {/* Fecha de Nacimiento y Edad */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={`block text-sm font-medium mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <FiCalendar size={16} />
+                Fecha de Nacimiento
+              </label>
+              <input
+                type="date"
+                name="birthDate"
+                value={formData.birthDate}
+                onChange={handleChange}
+                className={`w-full px-3 py-2 rounded-lg border transition ${
+                  darkMode
+                    ? 'bg-slate-700 border-slate-600 text-white'
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
+              />
+            </div>
+            <div>
+              <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Edad
+              </label>
+              <div className={`px-3 py-2 rounded-lg border flex items-center ${
+                darkMode
+                  ? 'bg-slate-600 border-slate-500 text-gray-300'
+                  : 'bg-gray-100 border-gray-300 text-gray-700'
+              }`}>
+                {calculatedAge !== null ? (
+                  <span className="font-semibold">{calculatedAge} años</span>
+                ) : (
+                  <span className="text-gray-500 text-sm">No calculada</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Ocupación */}
+          <div>
+            <label className={`block text-sm font-medium mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <FiBriefcase size={16} />
+              Ocupación
+            </label>
+            <input
+              type="text"
+              name="occupation"
+              value={formData.occupation}
+              onChange={handleChange}
+              placeholder="Ej: Docente, Ingeniero, Estudiante..."
+              className={`w-full px-3 py-2 rounded-lg border transition ${
+                darkMode
+                  ? 'bg-slate-700 border-slate-600 text-white placeholder-gray-400'
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
             />
           </div>
 
@@ -176,7 +272,8 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
               Cancelar
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={handleSubmit}
               className={`flex-1 py-2 rounded-lg font-medium text-white transition ${
                 darkMode
                   ? 'bg-blue-600 hover:bg-blue-700'
@@ -186,7 +283,7 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
               {patient ? 'Actualizar' : 'Guardar'}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

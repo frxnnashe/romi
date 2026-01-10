@@ -1,6 +1,6 @@
 // src/components/PatientList.jsx
 import { useState } from 'react';
-import { FiTrash2, FiEdit2, FiSearch, FiPlus } from 'react-icons/fi';
+import { FiTrash2, FiEdit2, FiSearch, FiPlus, FiCalendar } from 'react-icons/fi';
 
 export default function PatientList({
   darkMode,
@@ -8,6 +8,7 @@ export default function PatientList({
   onEdit,
   onDelete,
   onViewAppointments,
+  onViewAnnualCalendar,
 }) {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -65,14 +66,41 @@ export default function PatientList({
                 <div className="flex-1">
                   <h3 className={`font-semibold text-lg ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                     {patient.name}
+                    {patient.age && (
+                      <span className={`ml-2 text-sm font-normal ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                        ({patient.age} años)
+                      </span>
+                    )}
                   </h3>
-                  <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <p>DNI: {patient.dni}</p>
-                    <p>Teléfono: {patient.phone}</p>
-                    {patient.insurance && <p>Obra Social: {patient.insurance}</p>}
+                  <div className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
+                      <p>📄 DNI: {patient.dni}</p>
+                      <p>📱 Teléfono: {patient.phone || 'No registrado'}</p>
+                      {patient.birthDate && (
+                        <p>🎂 Nacimiento: {new Date(patient.birthDate).toLocaleDateString('es-AR')}</p>
+                      )}
+                      {patient.occupation && (
+                        <p>💼 Ocupación: {patient.occupation}</p>
+                      )}
+                      {patient.insurance && (
+                        <p>🏥 Obra Social: {patient.insurance}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 ml-4">
+                  <button
+                    onClick={() => onViewAnnualCalendar(patient)}
+                    className={`px-3 py-1 rounded text-sm font-medium transition flex items-center gap-1 ${
+                      darkMode
+                        ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                        : 'bg-purple-500 hover:bg-purple-600 text-white'
+                    }`}
+                    title="Calendario Anual"
+                  >
+                    <FiCalendar size={16} />
+                    Calendario
+                  </button>
                   <button
                     onClick={() => onViewAppointments(patient.id)}
                     className={`px-3 py-1 rounded text-sm font-medium transition ${
