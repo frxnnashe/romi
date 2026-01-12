@@ -189,17 +189,6 @@ import {
             {/* Botones */}
             <div className="flex gap-3 pt-6 border-t">
               <button
-                onClick={handlePrint}
-                className={`flex-1 py-3 rounded-lg flex items-center justify-center gap-2 ${
-                  darkMode
-                    ? "bg-slate-700 hover:bg-slate-600 text-white"
-                    : "bg-gray-200 hover:bg-gray-300 text-gray-700"
-                }`}
-              >
-                <FiPrinter size={18} />
-                Imprimir
-              </button>
-              <button
                 onClick={onClose}
                 className={`flex-1 py-3 rounded-lg flex items-center justify-center gap-2 text-white ${
                   darkMode

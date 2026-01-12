@@ -10,7 +10,8 @@ import ClinicalHistoryPage from './pages/ClinicalHistoryPage';
 import TherapyNotesPage from './pages/TherapyNotesPage';
 import TherapeuticToolsPage from './pages/TherapeuticToolsPage';
 import PaymentsPage from './pages/PaymentsPage';
-import DashboardPage from './pages/DashboardPage';
+import ResourcesPage from './pages/ResourcesPage';
+import PendientesPage from './pages/PendientesPage';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -28,8 +29,9 @@ function App() {
             <Route path="/historias-clinicas" element={<ClinicalHistoryPage darkMode={darkMode} />} />
             <Route path="/notas-terapia" element={<TherapyNotesPage darkMode={darkMode} />} />
             <Route path="/herramientas" element={<TherapeuticToolsPage darkMode={darkMode} />} />
+            <Route path="/recursos" element={<ResourcesPage darkMode={darkMode} />} />
+            <Route path="/pendientes" element={<PendientesPage darkMode={darkMode} />} />
             <Route path="/pagos" element={<PaymentsPage darkMode={darkMode} />} />
-            <Route path="/dashboard" element={<DashboardPage darkMode={darkMode} />} />
           </Routes>
         </main>
 

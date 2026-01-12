@@ -1,7 +1,7 @@
 // src/components/Navbar.jsx
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FiMenu, FiX, FiSun, FiMoon, FiCalendar, FiUsers, FiFileText, FiEdit, FiDollarSign, FiTrendingUp, FiTool, FiCreditCard } from 'react-icons/fi';
+import { FiMenu, FiX, FiSun, FiMoon, FiCalendar, FiUsers, FiFileText, FiEdit, FiDollarSign, FiTrendingUp, FiTool, FiCreditCard, FiBook, FiBookOpen, FiCheckSquare } from 'react-icons/fi';
 
 export default function Navbar({ darkMode, setDarkMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -13,8 +13,9 @@ export default function Navbar({ darkMode, setDarkMode }) {
     { label: 'Historias Clínicas', path: '/historias-clinicas', icon: FiFileText, color: 'text-purple-500', bgActive: 'bg-purple-500/10' },
     { label: 'Notas de Terapia', path: '/notas-terapia', icon: FiEdit, color: 'text-indigo-500', bgActive: 'bg-indigo-500/10' },
     { label: 'Herramientas', path: '/herramientas', icon: FiTool, color: 'text-orange-500', bgActive: 'bg-orange-500/10' },
+    { label: 'Pendientes', path: '/pendientes', icon: FiCheckSquare, color: 'text-teal-500', bgActive: 'bg-teal-500/10' },
+    { label: 'Recursos', path: '/recursos', icon: FiBookOpen, color: 'text-pink-500', bgActive: 'bg-pink-500/10' },
     { label: 'Pagos', path: '/pagos', icon: FiDollarSign, color: 'text-emerald-500', bgActive: 'bg-emerald-500/10' },
-    { label: 'Dashboard', path: '/dashboard', icon: FiTrendingUp, color: 'text-cyan-500', bgActive: 'bg-cyan-500/10' },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -25,7 +26,7 @@ export default function Navbar({ darkMode, setDarkMode }) {
         <div className="flex justify-between items-center h-16">
           <Link to="/" className={`text-2xl font-bold ${darkMode ? 'text-blue-400' : 'text-blue-600'} flex items-center gap-2`}>
             <span className="text-3xl">🏥</span>
-            KineGest
+            PsicoGest
           </Link>
 
           {/* Desktop Menu */}

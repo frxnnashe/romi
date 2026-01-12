@@ -207,7 +207,7 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              placeholder="Ej: 351-1234567 o 3511234567"
+              placeholder="Ej: 3511234567"
               className={`w-full px-3 py-2 rounded-lg border transition ${
                 darkMode
                   ? 'bg-slate-700 border-slate-600 text-white placeholder-gray-400'

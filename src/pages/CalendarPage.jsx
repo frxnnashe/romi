@@ -5,7 +5,7 @@ import TurnoModal from '../components/TurnoModal';
 import RecurringPatientModal from '../components/RecurringPatientModal';
 import { useFirestore } from '../hooks/useFirestore';
 import { usePatients } from '../hooks/usePatients';
-import { FiTrash2, FiEdit2, FiRepeat, FiMessageCircle } from 'react-icons/fi';
+import { FiTrash2, FiEdit2, FiRepeat, FiMessageCircle, FiGift } from 'react-icons/fi';
 import { formatDate } from '../utils/dateUtils';
 
 export default function CalendarPage({ darkMode }) {
@@ -13,33 +13,30 @@ export default function CalendarPage({ darkMode }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [appointments, setAppointments] = useState([]);
   const [appointmentsPerDay, setAppointmentsPerDay] = useState({});
+  const [birthdaysPerDay, setBirthdaysPerDay] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [showRecurringModal, setShowRecurringModal] = useState(false);
   const [editingTurno, setEditingTurno] = useState(null);
   const [dayAppointments, setDayAppointments] = useState([]);
+  const [dayBirthdays, setDayBirthdays] = useState([]);
 
   const { addDocument, updateDocument, deleteDocument, getDocuments } = useFirestore('appointments');
   const { patients } = usePatients();
 
-  // Cargar turnos cuando cambia el mes
+  // Cargar turnos y cumpleaños cuando cambia el mes
   useEffect(() => {
     loadAppointmentsForMonth(currentMonth);
-  }, [currentMonth]);
+    loadBirthdaysForMonth(currentMonth);
+  }, [currentMonth, patients]);
 
   const loadAppointmentsForMonth = async (date) => {
-    // Obtener primer y último día del mes
-    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59);
-
     const data = await getDocuments();
     
-    // Filtrar turnos del mes actual - comparar fechas como strings
     const filteredData = data.filter(apt => {
-      // Extraer año-mes-día del string de fecha
-      const aptDateStr = apt.date.substring(0, 10); // YYYY-MM-DD
-      const [aptYear, aptMonth, aptDay] = aptDateStr.split('-').map(Number);
+      const aptDateStr = apt.date.substring(0, 10);
+      const [aptYear, aptMonth] = aptDateStr.split('-').map(Number);
       
-      const month = date.getMonth() + 1; // JavaScript months are 0-indexed
+      const month = date.getMonth() + 1;
       const year = date.getFullYear();
       
       return aptYear === year && aptMonth === month;
@@ -49,10 +46,42 @@ export default function CalendarPage({ darkMode }) {
     groupByDay(filteredData);
   };
 
+  const loadBirthdaysForMonth = (date) => {
+    const month = date.getMonth() + 1; // JavaScript months are 0-indexed
+    
+    const birthdaysByDay = {};
+    
+    patients.forEach(patient => {
+      if (patient.birthDate) {
+        // Extraer mes y día del birthDate (YYYY-MM-DD)
+        const [, birthMonth, birthDay] = patient.birthDate.split('-').map(Number);
+        
+        // Si el mes de nacimiento coincide con el mes actual
+        if (birthMonth === month) {
+          if (!birthdaysByDay[birthDay]) {
+            birthdaysByDay[birthDay] = [];
+          }
+          birthdaysByDay[birthDay].push({
+            name: patient.name,
+            age: calculateAge(patient.birthDate, date.getFullYear()),
+            phone: patient.phone,
+            patientId: patient.id
+          });
+        }
+      }
+    });
+    
+    setBirthdaysPerDay(birthdaysByDay);
+  };
+
+  const calculateAge = (birthDate, currentYear) => {
+    const [birthYear] = birthDate.split('-').map(Number);
+    return currentYear - birthYear;
+  };
+
   const groupByDay = (data) => {
     const grouped = {};
     data.forEach((apt) => {
-      // Extraer el día del string de fecha YYYY-MM-DD
       const aptDateStr = apt.date.substring(0, 10);
       const [, , dayStr] = aptDateStr.split('-');
       const day = parseInt(dayStr, 10);
@@ -67,6 +96,7 @@ export default function CalendarPage({ darkMode }) {
     setSelectedDay(date);
     const day = date.getDate();
     setDayAppointments(appointmentsPerDay[day] || []);
+    setDayBirthdays(birthdaysPerDay[day] || []);
     setEditingTurno(null);
   };
 
@@ -87,7 +117,6 @@ export default function CalendarPage({ darkMode }) {
 
   const handleSaveRecurringAppointments = async (appointmentsArray) => {
     try {
-      // Guardar todos los turnos generados
       const promises = appointmentsArray.map(apt => addDocument(apt));
       await Promise.all(promises);
       
@@ -119,23 +148,17 @@ export default function CalendarPage({ darkMode }) {
     setShowRecurringModal(true);
   };
 
-  // Función para enviar notificación por WhatsApp
   const handleSendWhatsApp = (appointment) => {
-    // Buscar el paciente para obtener su teléfono
     const patient = patients.find(p => p.id === appointment.patientId);
     
     if (!patient || !patient.phone) {
-      alert('El paciente no tiene un número de teléfono registrado. Por favor, actualiza sus datos.');
+      alert('El paciente no tiene un número de teléfono registrado.');
       return;
     }
 
-    // Limpiar el número de teléfono (remover espacios, guiones, etc.)
     const cleanPhone = patient.phone.replace(/\D/g, '');
-    
-    // Si el número no tiene código de país, asumir Argentina (+54)
     const phoneWithCountry = cleanPhone.startsWith('54') ? cleanPhone : `54${cleanPhone}`;
 
-    // Crear fecha desde el string YYYY-MM-DD sin conversión de zona horaria
     const [year, month, day] = appointment.date.substring(0, 10).split('-').map(Number);
     const appointmentDate = new Date(year, month - 1, day);
     
@@ -146,29 +169,42 @@ export default function CalendarPage({ darkMode }) {
       day: 'numeric' 
     });
 
-    // Crear el mensaje
-    const message = `Hola ${patient.name}! 👋\n\n` +
-                   `Te recordamos tu turno de kinesiología:\n\n` +
-                   `📅 Fecha: ${dateStr}\n` +
-                   `🕐 Hora: ${appointment.time}\n\n` +
-                   `¡Te esperamos! Si necesitas reprogramar, avisanos con tiempo.\n\n` +
-                   `Saludos 😊`;
+    const message = `Hola ${patient.name}! \n\n` +
+                   `Te recuerdo tu turno de Psicología:\n\n` +
+                   ` Fecha: ${dateStr}\n` +
+                   ` Hora: ${appointment.time}\n\n` +
+                   ` ¡Te espero!\n\n` +
+                   `Saludos`;
 
-    // Codificar el mensaje para URL
     const encodedMessage = encodeURIComponent(message);
-
-    // Construir la URL de WhatsApp
     const whatsappUrl = `https://wa.me/${phoneWithCountry}?text=${encodedMessage}`;
-
-    // Abrir WhatsApp en una nueva pestaña
     window.open(whatsappUrl, '_blank');
   };
 
-  // Handler para cuando cambia el mes en el calendario
+  const handleSendBirthdayWhatsApp = (birthday) => {
+    if (!birthday.phone) {
+      alert('Este paciente no tiene un número de teléfono registrado.');
+      return;
+    }
+
+    const cleanPhone = birthday.phone.replace(/\D/g, '');
+    const phoneWithCountry = cleanPhone.startsWith('54') ? cleanPhone : `54${cleanPhone}`;
+
+    const message = `¡Feliz cumpleaños ${birthday.name}! 🎉🎂\n\n` +
+                   `Te deseamos un día maravilloso lleno de alegría y felicidad.\n\n` +
+                   `¡Que cumplas muchos más! 🎈\n\n` +
+                   `Saludos cariñosos 💙`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phoneWithCountry}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const handleMonthChange = (newDate) => {
     setCurrentMonth(newDate);
-    setSelectedDay(null); // Limpiar día seleccionado al cambiar mes
+    setSelectedDay(null);
     setDayAppointments([]);
+    setDayBirthdays([]);
   };
 
   return (
@@ -179,12 +215,13 @@ export default function CalendarPage({ darkMode }) {
           <Calendar
             darkMode={darkMode}
             appointmentsPerDay={appointmentsPerDay}
+            birthdaysPerDay={birthdaysPerDay}
             onSelectDay={handleSelectDay}
             onMonthChange={handleMonthChange}
           />
         </div>
 
-        {/* Panel de Turnos del Día */}
+        {/* Panel de Turnos y Cumpleaños del Día */}
         <div className={`${darkMode ? 'bg-slate-800' : 'bg-white'} rounded-lg shadow-lg p-6 h-fit`}>
           <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
             {selectedDay ? formatDate(selectedDay) : 'Selecciona un día'}
@@ -218,8 +255,59 @@ export default function CalendarPage({ darkMode }) {
             </button>
           </div>
 
+          {/* Cumpleaños del día */}
+          {dayBirthdays.length > 0 && (
+            <div className="mb-4">
+              <h4 className={`text-sm font-semibold mb-2 flex items-center gap-2 ${darkMode ? 'text-pink-400' : 'text-pink-600'}`}>
+                <FiGift size={16} />
+                🎉 Cumpleaños del día
+              </h4>
+              <div className="space-y-2">
+                {dayBirthdays.map((birthday, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-3 rounded-lg border-2 ${
+                      darkMode
+                        ? 'bg-pink-900/20 border-pink-700'
+                        : 'bg-pink-50 border-pink-200'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className={`font-semibold ${darkMode ? 'text-pink-300' : 'text-pink-900'}`}>
+                          🎂 {birthday.name}
+                        </p>
+                        <p className={`text-sm ${darkMode ? 'text-pink-400' : 'text-pink-700'}`}>
+                          Cumple {birthday.age} años
+                        </p>
+                      </div>
+                      {birthday.phone && (
+                        <button
+                          onClick={() => handleSendBirthdayWhatsApp(birthday)}
+                          className={`px-3 py-1.5 rounded-lg transition flex items-center gap-1 text-xs font-medium ${
+                            darkMode
+                              ? 'bg-pink-600 hover:bg-pink-700 text-white'
+                              : 'bg-pink-500 hover:bg-pink-600 text-white'
+                          }`}
+                        >
+                          <FiMessageCircle size={12} />
+                          Felicitar
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Lista de Turnos */}
           <div className="space-y-3 max-h-96 overflow-y-auto">
+            {dayAppointments.length > 0 && (
+              <h4 className={`text-sm font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Turnos del día
+              </h4>
+            )}
             {dayAppointments.length > 0 ? (
               dayAppointments.map((apt) => {
                 const patient = patients.find(p => p.id === apt.patientId);
@@ -258,7 +346,6 @@ export default function CalendarPage({ darkMode }) {
                       </div>
                     </div>
 
-                    {/* Botones de Acción */}
                     <div className="flex gap-1 mt-2">
                       {hasPhone && (
                         <button
@@ -268,7 +355,6 @@ export default function CalendarPage({ darkMode }) {
                               ? 'bg-green-600 hover:bg-green-700 text-white'
                               : 'bg-green-500 hover:bg-green-600 text-white'
                           }`}
-                          title="Enviar recordatorio por WhatsApp"
                         >
                           <FiMessageCircle size={14} />
                           WhatsApp
@@ -281,7 +367,6 @@ export default function CalendarPage({ darkMode }) {
                             ? 'bg-slate-600 hover:bg-slate-500 text-white'
                             : 'bg-gray-200 hover:bg-gray-300'
                         }`}
-                        title="Editar turno"
                       >
                         <FiEdit2 size={14} />
                       </button>
@@ -292,13 +377,11 @@ export default function CalendarPage({ darkMode }) {
                             ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400'
                             : 'bg-red-100 hover:bg-red-200 text-red-600'
                         }`}
-                        title="Eliminar turno"
                       >
                         <FiTrash2 size={14} />
                       </button>
                     </div>
 
-                    {/* Advertencia si no hay teléfono */}
                     {!hasPhone && (
                       <div className={`mt-2 text-xs p-2 rounded ${
                         darkMode ? 'bg-yellow-900/20 text-yellow-400' : 'bg-yellow-50 text-yellow-700'
@@ -309,11 +392,11 @@ export default function CalendarPage({ darkMode }) {
                   </div>
                 );
               })
-            ) : selectedDay ? (
+            ) : selectedDay && dayBirthdays.length === 0 ? (
               <p className={`text-center py-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 Sin turnos este día
               </p>
-            ) : (
+            ) : !selectedDay && (
               <p className={`text-center py-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 Selecciona un día para ver los turnos
               </p>
@@ -322,7 +405,6 @@ export default function CalendarPage({ darkMode }) {
         </div>
       </div>
 
-      {/* Modal Turno Individual */}
       <TurnoModal
         darkMode={darkMode}
         isOpen={showModal}
@@ -333,7 +415,6 @@ export default function CalendarPage({ darkMode }) {
         selectedDate={selectedDay}
       />
 
-      {/* Modal Paciente Recurrente */}
       <RecurringPatientModal
         darkMode={darkMode}
         isOpen={showRecurringModal}

@@ -102,16 +102,6 @@ export default function PatientList({
                     Calendario
                   </button>
                   <button
-                    onClick={() => onViewAppointments(patient.id)}
-                    className={`px-3 py-1 rounded text-sm font-medium transition ${
-                      darkMode
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                        : 'bg-blue-500 hover:bg-blue-600 text-white'
-                    }`}
-                  >
-                    Historial
-                  </button>
-                  <button
                     onClick={() => onEdit(patient)}
                     className={`p-2 rounded transition ${
                       darkMode
