@@ -8,10 +8,10 @@ export default defineConfig({
     react(),
     VitePWA({
       manifest: {
-        name: "Kine Gest: Gestión Kinesiológica",
-        short_name: "Kine Gest",
+        name: "Psico Gest. Gestion Clinica",
+        short_name: "Psico Gest",
         description:
-          "Gestión integral de pacientes, sesiones y fichas en kinesiología.",
+          "Gestión integral de pacientes.",
         start_url: "/",
         display: "standalone",
         orientation: "portrait",
@@ -19,25 +19,25 @@ export default defineConfig({
         background_color: "#E0FFFF",
         icons: [
           {
-            "src": "public/manifest-icon-192.maskable.png",
+            "src": "/manifest-icon-192.maskable.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any"
           },
           {
-            "src": "public/manifest-icon-192.maskable.png",
+            "src": "/manifest-icon-192.maskable.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "maskable"
           },
           {
-            "src": "public/manifest-icon-512.maskable.png",
+            "src": "/manifest-icon-512.maskable.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any"
           },
           {
-            "src": "public/manifest-icon-512.maskable.png",
+            "src": "/manifest-icon-512.maskable.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
