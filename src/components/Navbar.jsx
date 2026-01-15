@@ -1,11 +1,28 @@
 // src/components/Navbar.jsx
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FiMenu, FiX, FiSun, FiMoon, FiCalendar, FiUsers, FiFileText, FiEdit, FiDollarSign, FiTrendingUp, FiTool, FiCreditCard, FiBook, FiBookOpen, FiCheckSquare } from 'react-icons/fi';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FiMenu, FiX, FiSun, FiMoon, FiCalendar, FiUsers, FiFileText, FiEdit, FiDollarSign, FiTool, FiBookOpen, FiCheckSquare, FiLogOut } from 'react-icons/fi';
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase/config.js';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import toast from 'react-hot-toast';
 
 export default function Navbar({ darkMode, setDarkMode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const [user] = useAuthState(auth);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success('Sesión cerrada');
+      navigate('/login');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      toast.error('Error al cerrar sesión');
+    }
+  };
 
   const navItems = [
     { label: 'Calendario', path: '/calendario', icon: FiCalendar, color: 'text-blue-500', bgActive: 'bg-blue-500/10' },
@@ -19,6 +36,9 @@ export default function Navbar({ darkMode, setDarkMode }) {
   ];
 
   const isActive = (path) => location.pathname === path;
+
+  // No mostrar navbar en la página de login
+  if (!user) return null;
 
   return (
     <nav className={`${darkMode ? 'bg-slate-900 border-b border-slate-800' : 'bg-white border-b border-gray-200'} shadow-lg sticky top-0 z-50`}>
@@ -53,8 +73,8 @@ export default function Navbar({ darkMode, setDarkMode }) {
             })}
           </div>
 
-          {/* Theme Toggle & Mobile Menu Button */}
-          <div className="flex items-center gap-4">
+          {/* Theme Toggle, Logout & Mobile Menu Button */}
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setDarkMode(!darkMode)}
               className={`p-2 rounded-lg transition ${
@@ -66,7 +86,20 @@ export default function Navbar({ darkMode, setDarkMode }) {
             </button>
 
             <button
-              className="lg:hidden"
+              onClick={handleLogout}
+              className={`hidden lg:flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
+                darkMode 
+                  ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' 
+                  : 'bg-red-50 text-red-600 hover:bg-red-100'
+              }`}
+              title="Cerrar Sesión"
+            >
+              <FiLogOut size={16} />
+              Salir
+            </button>
+
+            <button
+              className="lg:hidden p-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
@@ -98,6 +131,22 @@ export default function Navbar({ darkMode, setDarkMode }) {
                 </Link>
               );
             })}
+            
+            {/* Logout button in mobile menu */}
+            <button
+              onClick={() => {
+                handleLogout();
+                setMobileMenuOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition mt-2 ${
+                darkMode 
+                  ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20' 
+                  : 'bg-red-50 text-red-600 hover:bg-red-100'
+              }`}
+            >
+              <FiLogOut size={18} />
+              Cerrar Sesión
+            </button>
           </div>
         )}
       </div>

@@ -1,9 +1,11 @@
-// src/App.jsx
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import ProtectedRoute from './components/ProtectedRoute';
 import CalendarPage from './pages/CalendarPage';
 import PatientsPage from './pages/PatientsPage';
 import ClinicalHistoryPage from './pages/ClinicalHistoryPage';
@@ -23,15 +25,82 @@ function App() {
 
         <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
           <Routes>
+            <Route path="/login" element={<LoginPage darkMode={darkMode} />} />
+            <Route path="/register" element={<RegisterPage darkMode={darkMode} />} />
+            
             <Route path="/" element={<Navigate to="/calendario" replace />} />
-            <Route path="/calendario" element={<CalendarPage darkMode={darkMode} />} />
-            <Route path="/pacientes" element={<PatientsPage darkMode={darkMode} />} />
-            <Route path="/historias-clinicas" element={<ClinicalHistoryPage darkMode={darkMode} />} />
-            <Route path="/notas-terapia" element={<TherapyNotesPage darkMode={darkMode} />} />
-            <Route path="/herramientas" element={<TherapeuticToolsPage darkMode={darkMode} />} />
-            <Route path="/recursos" element={<ResourcesPage darkMode={darkMode} />} />
-            <Route path="/pendientes" element={<PendientesPage darkMode={darkMode} />} />
-            <Route path="/pagos" element={<PaymentsPage darkMode={darkMode} />} />
+            
+            <Route 
+              path="/calendario" 
+              element={
+                <ProtectedRoute>
+                  <CalendarPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/pacientes" 
+              element={
+                <ProtectedRoute>
+                  <PatientsPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/historias-clinicas" 
+              element={
+                <ProtectedRoute>
+                  <ClinicalHistoryPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/notas-terapia" 
+              element={
+                <ProtectedRoute>
+                  <TherapyNotesPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/herramientas" 
+              element={
+                <ProtectedRoute>
+                  <TherapeuticToolsPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/recursos" 
+              element={
+                <ProtectedRoute>
+                  <ResourcesPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/pendientes" 
+              element={
+                <ProtectedRoute>
+                  <PendientesPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/pagos" 
+              element={
+                <ProtectedRoute>
+                  <PaymentsPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </main>
 
