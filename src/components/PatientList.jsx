@@ -18,6 +18,15 @@ export default function PatientList({
       p.dni.includes(searchTerm)
   );
 
+  // Función para formatear fecha correctamente
+  const formatBirthDate = (birthDate) => {
+    if (!birthDate) return '';
+    
+    // Si la fecha viene en formato YYYY-MM-DD
+    const [year, month, day] = birthDate.split('-');
+    return `${day}/${month}/${year}`;
+  };
+
   return (
     <div className={`${darkMode ? 'bg-slate-800' : 'bg-white'} rounded-lg shadow-lg p-6`}>
       <div className="flex justify-between items-center mb-6">
@@ -77,7 +86,7 @@ export default function PatientList({
                       <p>📄 DNI: {patient.dni}</p>
                       <p>📱 Teléfono: {patient.phone || 'No registrado'}</p>
                       {patient.birthDate && (
-                        <p>🎂 Nacimiento: {new Date(patient.birthDate).toLocaleDateString('es-AR')}</p>
+                        <p>🎂 Nacimiento: {formatBirthDate(patient.birthDate)}</p>
                       )}
                       {patient.occupation && (
                         <p>💼 Ocupación: {patient.occupation}</p>

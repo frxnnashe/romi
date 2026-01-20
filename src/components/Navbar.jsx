@@ -33,6 +33,8 @@ export default function Navbar({ darkMode, setDarkMode }) {
     { label: 'Pendientes', path: '/pendientes', icon: FiCheckSquare, color: 'text-teal-500', bgActive: 'bg-teal-500/10' },
     { label: 'Recursos', path: '/recursos', icon: FiBookOpen, color: 'text-pink-500', bgActive: 'bg-pink-500/10' },
     { label: 'Pagos', path: '/pagos', icon: FiDollarSign, color: 'text-emerald-500', bgActive: 'bg-emerald-500/10' },
+    { label: 'Gastos', path: '/gastos', icon: FiDollarSign, color: 'text-emerald-500', bgActive: 'bg-red-500/10' },
+    { label: 'Dashboard', path: '/dashboard', icon: FiTool, color: 'text-orange-500', bgActive: 'bg-grey-500/10' },
   ];
 
   const isActive = (path) => location.pathname === path;

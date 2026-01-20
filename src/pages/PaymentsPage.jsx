@@ -17,6 +17,7 @@ export default function PaymentsPage({ darkMode }) {
   const [appointments, setAppointments] = useState([]);
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [filterStatus, setFilterStatus] = useState('todos');
+  const [filterPaymentMethod, setFilterPaymentMethod] = useState('todos');
   const [filterMonth, setFilterMonth] = useState(() => {
     const now = new Date();
     const year = now.getFullYear();
@@ -35,7 +36,7 @@ export default function PaymentsPage({ darkMode }) {
 
   useEffect(() => {
     filterAppointments();
-  }, [appointments, filterStatus, filterMonth]);
+  }, [appointments, filterStatus, filterMonth, filterPaymentMethod]);
 
   const loadAppointments = async () => {
     const data = await getDocuments();
@@ -54,6 +55,10 @@ export default function PaymentsPage({ darkMode }) {
     if (filterStatus !== 'todos') {
       const isPaid = filterStatus === 'pagados';
       filtered = filtered.filter((apt) => apt.paid === isPaid);
+    }
+
+    if (filterPaymentMethod !== 'todos') {
+      filtered = filtered.filter((apt) => apt.paymentMethod === filterPaymentMethod);
     }
 
     setFilteredAppointments(filtered);
@@ -91,12 +96,18 @@ export default function PaymentsPage({ darkMode }) {
     pending: filteredAppointments
       .filter((a) => !a.paid)
       .reduce((sum, a) => sum + (Number(a.amount) || 0), 0),
+    efectivo: filteredAppointments
+      .filter((a) => a.paid && a.paymentMethod === 'efectivo')
+      .reduce((sum, a) => sum + (Number(a.amount) || 0), 0),
+    transferencia: filteredAppointments
+      .filter((a) => a.paid && a.paymentMethod === 'transferencia')
+      .reduce((sum, a) => sum + (Number(a.amount) || 0), 0),
   };
 
   return (
     <div className="space-y-6">
       {/* Tarjetas de Resumen */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div
           className={`p-6 rounded-lg shadow-lg ${
             darkMode ? 'bg-slate-800' : 'bg-white'
@@ -135,6 +146,32 @@ export default function PaymentsPage({ darkMode }) {
             ${stats.pending.toFixed(2)}
           </p>
         </div>
+
+        <div
+          className={`p-6 rounded-lg shadow-lg ${
+            darkMode ? 'bg-slate-800' : 'bg-white'
+          }`}
+        >
+          <p className={`text-sm font-medium flex items-center gap-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            💵 Efectivo
+          </p>
+          <p className={`text-3xl font-bold mt-2 ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+            ${stats.efectivo.toFixed(2)}
+          </p>
+        </div>
+
+        <div
+          className={`p-6 rounded-lg shadow-lg ${
+            darkMode ? 'bg-slate-800' : 'bg-white'
+          }`}
+        >
+          <p className={`text-sm font-medium flex items-center gap-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            🏦 Transferencia
+          </p>
+          <p className={`text-3xl font-bold mt-2 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+            ${stats.transferencia.toFixed(2)}
+          </p>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -150,8 +187,8 @@ export default function PaymentsPage({ darkMode }) {
           </h3>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
             <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Estado
             </label>
@@ -170,7 +207,26 @@ export default function PaymentsPage({ darkMode }) {
             </select>
           </div>
 
-          <div className="flex-1">
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              Método de Pago
+            </label>
+            <select
+              value={filterPaymentMethod}
+              onChange={(e) => setFilterPaymentMethod(e.target.value)}
+              className={`w-full px-3 py-2 rounded-lg border transition ${
+                darkMode
+                  ? 'bg-slate-700 border-slate-600 text-white'
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
+            >
+              <option value="todos">Todos</option>
+              <option value="efectivo">💵 Efectivo</option>
+              <option value="transferencia">🏦 Transferencia</option>
+            </select>
+          </div>
+
+          <div>
             <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Mes
             </label>
@@ -224,11 +280,22 @@ export default function PaymentsPage({ darkMode }) {
                         <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                           {formatDate(appointmentDate)} - {apt.time}
                         </p>
-                        {apt.insurance && (
-                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                            {apt.insurance}
-                          </p>
-                        )}
+                        <div className="flex items-center gap-3 mt-1">
+                          {apt.insurance && (
+                            <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                              🏥 {apt.insurance}
+                            </span>
+                          )}
+                          {apt.paymentMethod && (
+                            <span className={`text-sm font-medium ${
+                              apt.paymentMethod === 'efectivo' 
+                                ? 'text-green-500' 
+                                : 'text-blue-500'
+                            }`}>
+                              {apt.paymentMethod === 'efectivo' ? '💵 Efectivo' : '🏦 Transferencia'}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

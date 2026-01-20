@@ -14,6 +14,8 @@ import TherapeuticToolsPage from './pages/TherapeuticToolsPage';
 import PaymentsPage from './pages/PaymentsPage';
 import ResourcesPage from './pages/ResourcesPage';
 import PendientesPage from './pages/PendientesPage';
+import ExpensesPage from './pages/ExpensesPage';
+import DashboardPage from './pages/DashboardPage';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -98,6 +100,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <PaymentsPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
+             <Route 
+              path="/gastos" 
+              element={
+                <ProtectedRoute>
+                  <ExpensesPage darkMode={darkMode} />
+                </ProtectedRoute>
+              } 
+            />
+             <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <DashboardPage darkMode={darkMode} />
                 </ProtectedRoute>
               } 
             />

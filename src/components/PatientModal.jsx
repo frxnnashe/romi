@@ -6,6 +6,7 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
     name: '',
     dni: '',
     phone: '',
+    phone2: '',
     insurance: '',
     notes: '',
     birthDate: '',
@@ -25,6 +26,7 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
         name: '',
         dni: '',
         phone: '',
+        phone2: '',
         insurance: '',
         notes: '',
         birthDate: '',
@@ -40,8 +42,11 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
       return;
     }
 
-    const birth = new Date(birthDate);
+    // Parsear la fecha directamente desde el string YYYY-MM-DD
+    const [year, month, day] = birthDate.split('-').map(Number);
+    const birth = new Date(year, month - 1, day); // month - 1 porque los meses van de 0-11
     const today = new Date();
+    
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
     
@@ -200,7 +205,7 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
           <div>
             <label className={`block text-sm font-medium mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               <FiPhone size={16} />
-              Teléfono (WhatsApp)
+              Teléfono Principal (WhatsApp)
             </label>
             <input
               type="tel"
@@ -216,6 +221,29 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
             />
             <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               📱 Incluir código de área (Ej: 351 para Córdoba)
+            </p>
+          </div>
+
+          {/* Teléfono 2 */}
+          <div>
+            <label className={`block text-sm font-medium mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <FiPhone size={16} />
+              Teléfono Secundario (Opcional)
+            </label>
+            <input
+              type="tel"
+              name="phone2"
+              value={formData.phone2}
+              onChange={handleChange}
+              placeholder="Ej: 3515678901"
+              className={`w-full px-3 py-2 rounded-lg border transition ${
+                darkMode
+                  ? 'bg-slate-700 border-slate-600 text-white placeholder-gray-400'
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
+            />
+            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              Teléfono alternativo o de contacto de emergencia
             </p>
           </div>
 

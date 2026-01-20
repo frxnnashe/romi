@@ -1,6 +1,6 @@
 // src/components/TurnoModal.jsx
 import { useState, useEffect } from 'react';
-import { FiX } from 'react-icons/fi';
+import { FiX, FiDollarSign } from 'react-icons/fi';
 
 // Función helper para convertir Date a string local YYYY-MM-DD
 const dateToLocalString = (date) => {
@@ -20,6 +20,7 @@ export default function TurnoModal({ darkMode, isOpen, onClose, onSave, turno, p
     insurance: '',
     amount: '',
     paid: false,
+    paymentMethod: 'efectivo',
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -27,7 +28,10 @@ export default function TurnoModal({ darkMode, isOpen, onClose, onSave, turno, p
 
   useEffect(() => {
     if (turno) {
-      setFormData(turno);
+      setFormData({
+        ...turno,
+        paymentMethod: turno.paymentMethod || 'efectivo'
+      });
       setSearchTerm(turno.patientName);
     } else {
       setFormData({
@@ -38,6 +42,7 @@ export default function TurnoModal({ darkMode, isOpen, onClose, onSave, turno, p
         insurance: '',
         amount: '',
         paid: false,
+        paymentMethod: 'efectivo',
       });
       setSearchTerm('');
     }
@@ -206,7 +211,8 @@ export default function TurnoModal({ darkMode, isOpen, onClose, onSave, turno, p
 
           {/* Monto */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <label className={`block text-sm font-medium mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              <FiDollarSign size={16} />
               Monto ($) *
             </label>
             <input
@@ -224,6 +230,45 @@ export default function TurnoModal({ darkMode, isOpen, onClose, onSave, turno, p
                   : 'bg-white border-gray-300 text-gray-900'
               }`}
             />
+          </div>
+
+          {/* Método de Pago */}
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              Método de Pago
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'efectivo' }))}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  formData.paymentMethod === 'efectivo'
+                    ? darkMode
+                      ? 'bg-green-600 text-white'
+                      : 'bg-green-500 text-white'
+                    : darkMode
+                      ? 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                💵 Efectivo
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, paymentMethod: 'transferencia' }))}
+                className={`px-4 py-2 rounded-lg font-medium transition ${
+                  formData.paymentMethod === 'transferencia'
+                    ? darkMode
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-500 text-white'
+                    : darkMode
+                      ? 'bg-slate-700 text-gray-300 hover:bg-slate-600'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                🏦 Transferencia
+              </button>
+            </div>
           </div>
 
           {/* Estado de Pago */}
