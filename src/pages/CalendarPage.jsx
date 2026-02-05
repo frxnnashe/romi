@@ -92,10 +92,29 @@ export default function CalendarPage({ darkMode }) {
     setAppointmentsPerDay(grouped);
   };
 
+  // Función para ordenar turnos por hora
+  const sortAppointmentsByTime = (appointments) => {
+    return [...appointments].sort((a, b) => {
+      // Convertir las horas a minutos para comparar
+      const [hoursA, minutesA] = a.time.split(':').map(Number);
+      const [hoursB, minutesB] = b.time.split(':').map(Number);
+      
+      const totalMinutesA = hoursA * 60 + minutesA;
+      const totalMinutesB = hoursB * 60 + minutesB;
+      
+      return totalMinutesA - totalMinutesB; // Orden ascendente (más temprano primero)
+    });
+  };
+
   const handleSelectDay = (date) => {
     setSelectedDay(date);
     const day = date.getDate();
-    setDayAppointments(appointmentsPerDay[day] || []);
+    
+    // Obtener turnos del día y ordenarlos por hora
+    const unsortedAppointments = appointmentsPerDay[day] || [];
+    const sortedAppointments = sortAppointmentsByTime(unsortedAppointments);
+    
+    setDayAppointments(sortedAppointments);
     setDayBirthdays(birthdaysPerDay[day] || []);
     setEditingTurno(null);
   };
@@ -171,9 +190,9 @@ export default function CalendarPage({ darkMode }) {
 
     const message = `Hola ${patient.name}! \n\n` +
                    `Te recuerdo tu turno de Psicología:\n\n` +
-                   ` Fecha: ${dateStr}\n` +
-                   ` Hora: ${appointment.time}\n\n` +
-                   ` ¡Te espero!\n\n` +
+                   `📅 Fecha: ${dateStr}\n` +
+                   `🕐 Hora: ${appointment.time}\n\n` +
+                   `¡Te espero!\n\n` +
                    `Saludos`;
 
     const encodedMessage = encodeURIComponent(message);
@@ -305,7 +324,7 @@ export default function CalendarPage({ darkMode }) {
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {dayAppointments.length > 0 && (
               <h4 className={`text-sm font-semibold mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                Turnos del día
+                Turnos del día ({dayAppointments.length})
               </h4>
             )}
             {dayAppointments.length > 0 ? (
@@ -326,7 +345,7 @@ export default function CalendarPage({ darkMode }) {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <p className={`font-semibold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                            {apt.time}
+                            🕐 {apt.time}
                           </p>
                           {apt.recurring && (
                             <span className="text-xs bg-purple-500 text-white px-2 py-0.5 rounded-full">

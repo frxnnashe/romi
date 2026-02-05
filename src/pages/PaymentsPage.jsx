@@ -18,6 +18,7 @@ export default function PaymentsPage({ darkMode }) {
   const [filteredAppointments, setFilteredAppointments] = useState([]);
   const [filterStatus, setFilterStatus] = useState('todos');
   const [filterPaymentMethod, setFilterPaymentMethod] = useState('todos');
+  const [filterPatient, setFilterPatient] = useState('todos');
   const [filterMonth, setFilterMonth] = useState(() => {
     const now = new Date();
     const year = now.getFullYear();
@@ -36,7 +37,7 @@ export default function PaymentsPage({ darkMode }) {
 
   useEffect(() => {
     filterAppointments();
-  }, [appointments, filterStatus, filterMonth, filterPaymentMethod]);
+  }, [appointments, filterStatus, filterMonth, filterPaymentMethod, filterPatient]);
 
   const loadAppointments = async () => {
     const data = await getDocuments();
@@ -59,6 +60,10 @@ export default function PaymentsPage({ darkMode }) {
 
     if (filterPaymentMethod !== 'todos') {
       filtered = filtered.filter((apt) => apt.paymentMethod === filterPaymentMethod);
+    }
+
+    if (filterPatient !== 'todos') {
+      filtered = filtered.filter((apt) => apt.patientId === filterPatient);
     }
 
     setFilteredAppointments(filtered);
@@ -187,7 +192,7 @@ export default function PaymentsPage({ darkMode }) {
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Estado
@@ -223,6 +228,28 @@ export default function PaymentsPage({ darkMode }) {
               <option value="todos">Todos</option>
               <option value="efectivo">💵 Efectivo</option>
               <option value="transferencia">🏦 Transferencia</option>
+            </select>
+          </div>
+
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              Paciente
+            </label>
+            <select
+              value={filterPatient}
+              onChange={(e) => setFilterPatient(e.target.value)}
+              className={`w-full px-3 py-2 rounded-lg border transition ${
+                darkMode
+                  ? 'bg-slate-700 border-slate-600 text-white'
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
+            >
+              <option value="todos">Todos</option>
+              {patients.map((patient) => (
+                <option key={patient.id} value={patient.id}>
+                  {patient.name}
+                </option>
+              ))}
             </select>
           </div>
 

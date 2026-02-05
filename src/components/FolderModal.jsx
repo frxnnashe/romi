@@ -5,20 +5,22 @@ export default function FolderModal({ darkMode, isOpen, onClose, onSave, folder 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    color: '#6366f1',
+    color: '#3b82f6',
   });
 
   const FOLDER_COLORS = [
-    { value: '#6366f1', label: 'Índigo' },
-    { value: '#8b5cf6', label: 'Púrpura' },
-    { value: '#ec4899', label: 'Rosa' },
-    { value: '#ef4444', label: 'Rojo' },
-    { value: '#f97316', label: 'Naranja' },
-    { value: '#eab308', label: 'Amarillo' },
-    { value: '#22c55e', label: 'Verde' },
-    { value: '#14b8a6', label: 'Turquesa' },
     { value: '#3b82f6', label: 'Azul' },
-    { value: '#64748b', label: 'Gris' },
+    { value: '#8b5cf6', label: 'Violeta' },
+    { value: '#ec4899', label: 'Rosa' },
+    { value: '#f43f5e', label: 'Rojo' },
+    { value: '#f97316', label: 'Naranja' },
+    { value: '#f59e0b', label: 'Ámbar' },
+    { value: '#84cc16', label: 'Lima' },
+    { value: '#10b981', label: 'Esmeralda' },
+    { value: '#14b8a6', label: 'Turquesa' },
+    { value: '#06b6d4', label: 'Cian' },
+    { value: '#6366f1', label: 'Índigo' },
+    { value: '#a855f7', label: 'Púrpura' },
   ];
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export default function FolderModal({ darkMode, isOpen, onClose, onSave, folder 
       setFormData({
         name: '',
         description: '',
-        color: '#6366f1',
+        color: '#3b82f6',
       });
     }
   }, [folder, isOpen]);
@@ -125,20 +127,25 @@ export default function FolderModal({ darkMode, isOpen, onClose, onSave, folder 
             <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Color de la Carpeta
             </label>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-6 gap-2">
               {FOLDER_COLORS.map((colorOption) => (
                 <button
                   key={colorOption.value}
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, color: colorOption.value }))}
-                  className={`w-full aspect-square rounded-lg transition flex items-center justify-center ${
-                    formData.color === colorOption.value ? 'ring-4 ring-offset-2 ring-blue-500' : ''
+                  className={`w-full aspect-square rounded-lg transition-all flex items-center justify-center ${
+                    formData.color === colorOption.value 
+                      ? 'ring-4 ring-offset-2 ring-offset-slate-800 scale-110' 
+                      : 'hover:scale-105'
                   }`}
-                  style={{ backgroundColor: colorOption.value }}
+                  style={{ 
+                    backgroundColor: colorOption.value,
+                    ringColor: colorOption.value 
+                  }}
                   title={colorOption.label}
                 >
                   {formData.color === colorOption.value && (
-                    <FiFolder size={20} className="text-white" />
+                    <FiFolder size={20} className="text-white drop-shadow-lg" />
                   )}
                 </button>
               ))}
@@ -149,7 +156,7 @@ export default function FolderModal({ darkMode, isOpen, onClose, onSave, folder 
           <div className={`p-4 rounded-lg border ${darkMode ? 'bg-slate-700 border-slate-600' : 'bg-gray-50 border-gray-200'}`}>
             <p className={`text-xs mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Vista previa:</p>
             <div className="flex items-center gap-2">
-              <FiFolder size={24} style={{ color: formData.color }} />
+              <FiFolder size={28} style={{ color: formData.color }} />
               <div className="flex-1 min-w-0">
                 <p className={`font-semibold truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   {formData.name || 'Nombre de carpeta'}

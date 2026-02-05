@@ -223,9 +223,10 @@ export default function ResourcesPage({ darkMode }) {
                         {doc.title}
                       </span>
                       {folder && (
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          darkMode ? 'bg-slate-600 text-gray-300' : 'bg-gray-200 text-gray-700'
-                        }`}>
+                        <span 
+                          className="text-xs px-2 py-1 rounded text-white font-medium"
+                          style={{ backgroundColor: folder.color || '#6366f1' }}
+                        >
                           {folder.name}
                         </span>
                       )}
@@ -248,18 +249,28 @@ export default function ResourcesPage({ darkMode }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredFolders.map((folder) => {
               const folderDocs = getDocumentsByFolder(folder.id);
+              const folderColor = folder.color || '#3b82f6';
+              
               return (
                 <div
                   key={folder.id}
-                  className={`p-4 rounded-lg border-2 transition ${
+                  className={`p-4 rounded-lg border-2 transition-all hover:shadow-lg ${
                     darkMode
-                      ? 'bg-slate-700 border-slate-600 hover:border-indigo-500'
-                      : 'bg-gray-50 border-gray-200 hover:border-indigo-400'
+                      ? 'bg-slate-700 border-slate-600'
+                      : 'bg-gray-50 border-gray-200'
                   }`}
+                  style={{ 
+                    borderColor: folderColor,
+                    borderWidth: '2px'
+                  }}
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <FiFolder size={24} className="text-indigo-500 flex-shrink-0" />
+                      <FiFolder 
+                        size={28} 
+                        style={{ color: folderColor }}
+                        className="flex-shrink-0"
+                      />
                       <h3 className={`font-semibold text-base truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                         {folder.name}
                       </h3>
@@ -314,11 +325,8 @@ export default function ResourcesPage({ darkMode }) {
 
                   <button
                     onClick={() => handleCreateDocument(folder)}
-                    className={`w-full py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 ${
-                      darkMode
-                        ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                        : 'bg-indigo-500 hover:bg-indigo-600 text-white'
-                    }`}
+                    className="w-full py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 text-white"
+                    style={{ backgroundColor: folderColor }}
                   >
                     <FiPlus size={14} />
                     Nuevo Documento
