@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useFirestore } from '../hooks/useFirestore';
 import { formatDate } from '../utils/dateUtils';
-import { FiFilter, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiFilter, FiEdit2, FiTrash2, FiSearch } from 'react-icons/fi';
 import TurnoModal from '../components/TurnoModal';
 import { usePatients } from '../hooks/usePatients';
 
@@ -19,6 +19,7 @@ export default function PaymentsPage({ darkMode }) {
   const [filterStatus, setFilterStatus] = useState('todos');
   const [filterPaymentMethod, setFilterPaymentMethod] = useState('todos');
   const [filterPatient, setFilterPatient] = useState('todos');
+  const [patientSearch, setPatientSearch] = useState('');
   const [filterMonth, setFilterMonth] = useState(() => {
     const now = new Date();
     const year = now.getFullYear();
@@ -37,7 +38,7 @@ export default function PaymentsPage({ darkMode }) {
 
   useEffect(() => {
     filterAppointments();
-  }, [appointments, filterStatus, filterMonth, filterPaymentMethod, filterPatient]);
+  }, [appointments, filterStatus, filterMonth, filterPaymentMethod, filterPatient, patientSearch]);
 
   const loadAppointments = async () => {
     const data = await getDocuments();
@@ -64,6 +65,13 @@ export default function PaymentsPage({ darkMode }) {
 
     if (filterPatient !== 'todos') {
       filtered = filtered.filter((apt) => apt.patientId === filterPatient);
+    }
+
+    // Filtro por búsqueda de nombre
+    if (patientSearch.trim()) {
+      filtered = filtered.filter((apt) => 
+        apt.patientName.toLowerCase().includes(patientSearch.toLowerCase())
+      );
     }
 
     setFilteredAppointments(filtered);
@@ -233,24 +241,25 @@ export default function PaymentsPage({ darkMode }) {
 
           <div>
             <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              Paciente
+              Buscar Paciente
             </label>
-            <select
-              value={filterPatient}
-              onChange={(e) => setFilterPatient(e.target.value)}
-              className={`w-full px-3 py-2 rounded-lg border transition ${
-                darkMode
-                  ? 'bg-slate-700 border-slate-600 text-white'
-                  : 'bg-white border-gray-300 text-gray-900'
-              }`}
-            >
-              <option value="todos">Todos</option>
-              {patients.map((patient) => (
-                <option key={patient.id} value={patient.id}>
-                  {patient.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <FiSearch className="absolute left-3 top-3 text-gray-400" size={16} />
+              <input
+                type="text"
+                value={patientSearch}
+                onChange={(e) => {
+                  setPatientSearch(e.target.value);
+                  setFilterPatient('todos'); // Resetear filtro de select al buscar
+                }}
+                placeholder="Buscar por nombre..."
+                className={`w-full pl-10 pr-4 py-2 rounded-lg border transition ${
+                  darkMode
+                    ? 'bg-slate-700 border-slate-600 text-white placeholder-gray-400'
+                    : 'bg-white border-gray-300 text-gray-900'
+                }`}
+              />
+            </div>
           </div>
 
           <div>

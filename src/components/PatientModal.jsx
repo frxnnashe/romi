@@ -11,6 +11,7 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
     notes: '',
     birthDate: '',
     occupation: '',
+    defaultAmount: '',
   });
 
   const [calculatedAge, setCalculatedAge] = useState(null);
@@ -31,6 +32,7 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
         notes: '',
         birthDate: '',
         occupation: '',
+        defaultAmount: '',
       });
       setCalculatedAge(null);
     }
@@ -264,6 +266,30 @@ export default function PatientModal({ darkMode, isOpen, onClose, onSave, patien
                   : 'bg-white border-gray-300 text-gray-900'
               }`}
             />
+          </div>
+
+          {/* Monto Fijo */}
+          <div>
+            <label className={`block text-sm font-medium mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              Monto Fijo por Sesión (Opcional)
+            </label>
+            <input
+              type="number"
+              name="defaultAmount"
+              value={formData.defaultAmount}
+              onChange={handleChange}
+              placeholder="Ej: 15000"
+              step="0.01"
+              min="0"
+              className={`w-full px-3 py-2 rounded-lg border transition ${
+                darkMode
+                  ? 'bg-slate-700 border-slate-600 text-white placeholder-gray-400'
+                  : 'bg-white border-gray-300 text-gray-900'
+              }`}
+            />
+            <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              💡 Se autocompletará al crear turnos para este paciente
+            </p>
           </div>
 
           {/* Notas */}

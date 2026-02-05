@@ -1,6 +1,5 @@
 // src/components/TurnoModal.jsx
 import { useState, useEffect } from 'react';
-import { FiX, FiDollarSign } from 'react-icons/fi';
 
 // Función helper para convertir Date a string local YYYY-MM-DD
 const dateToLocalString = (date) => {
@@ -68,6 +67,7 @@ export default function TurnoModal({ darkMode, isOpen, onClose, onSave, turno, p
       patientId: patient.id,
       patientName: patient.name,
       insurance: patient.insurance || '',
+      amount: patient.defaultAmount || '', // Autocompletar monto fijo
     }));
     setSearchTerm(patient.name);
     setShowDropdown(false);
@@ -109,7 +109,6 @@ export default function TurnoModal({ darkMode, isOpen, onClose, onSave, turno, p
             {turno ? 'Editar Turno' : 'Nuevo Turno'}
           </h2>
           <button onClick={onClose} className={`hover:opacity-70 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-            <FiX size={24} />
           </button>
         </div>
 
@@ -212,7 +211,6 @@ export default function TurnoModal({ darkMode, isOpen, onClose, onSave, turno, p
           {/* Monto */}
           <div>
             <label className={`block text-sm font-medium mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              <FiDollarSign size={16} />
               Monto ($) *
             </label>
             <input
