@@ -1,5 +1,6 @@
 // src/pages/PatientsPage.jsx
 import { useState } from 'react';
+import { FiArchive } from 'react-icons/fi';
 import PatientList from '../components/PatientList';
 import PatientModal from '../components/PatientModal';
 import PatientAnnualCalendar from '../components/PatientAnnualCalendar';
@@ -7,7 +8,8 @@ import { usePatients } from '../hooks/usePatients';
 import toast from 'react-hot-toast';
 
 export default function PatientsPage({ darkMode }) {
-  const { patients, addPatient, updatePatient, deletePatient } = usePatients();
+  const [showArchived, setShowArchived] = useState(false);
+  const { patients, addPatient, updatePatient, deletePatient, archivePatient, unarchivePatient } = usePatients(showArchived);
   
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [isPatientModalOpen, setIsPatientModalOpen] = useState(false);
@@ -38,13 +40,31 @@ export default function PatientsPage({ darkMode }) {
   };
 
   const handleDeletePatient = async (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este paciente?')) {
+    if (window.confirm('¿Estás seguro de eliminar este paciente? Esta acción no se puede deshacer.')) {
       try {
         await deletePatient(id);
         toast.success('Paciente eliminado');
       } catch (error) {
         toast.error('Error al eliminar paciente');
       }
+    }
+  };
+
+  const handleArchivePatient = async (id) => {
+    try {
+      await archivePatient(id);
+      toast.success('Paciente archivado');
+    } catch (error) {
+      toast.error('Error al archivar paciente');
+    }
+  };
+
+  const handleUnarchivePatient = async (id) => {
+    try {
+      await unarchivePatient(id);
+      toast.success('Paciente desarchivado');
+    } catch (error) {
+      toast.error('Error al desarchivar paciente');
     }
   };
 
@@ -70,14 +90,36 @@ export default function PatientsPage({ darkMode }) {
   };
 
   return (
-    <div>
+    <div className="space-y-4">
+      {/* Toggle para ver archivados */}
+      <div className={`${darkMode ? 'bg-slate-800' : 'bg-white'} rounded-lg shadow-lg p-4`}>
+        <button
+          onClick={() => setShowArchived(!showArchived)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition ${
+            showArchived
+              ? darkMode
+                ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                : 'bg-orange-500 hover:bg-orange-600 text-white'
+              : darkMode
+                ? 'bg-slate-700 hover:bg-slate-600 text-gray-300'
+                : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+          }`}
+        >
+          <FiArchive size={18} />
+          {showArchived ? 'Ocultar Archivados' : 'Mostrar Archivados'}
+        </button>
+      </div>
+
       <PatientList
         darkMode={darkMode}
         patients={patients}
         onEdit={handleEditPatient}
         onDelete={handleDeletePatient}
+        onArchive={handleArchivePatient}
+        onUnarchive={handleUnarchivePatient}
         onViewAppointments={handleViewAppointments}
         onViewAnnualCalendar={handleViewAnnualCalendar}
+        showArchived={showArchived}
       />
 
       <PatientModal

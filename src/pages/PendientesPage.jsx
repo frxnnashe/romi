@@ -279,14 +279,14 @@ export default function PendientesPage({ darkMode }) {
                             darkMode ? 'text-gray-500' : 'text-gray-500'
                           }`}>
                             <FiClock size={12} />
-                            {new Date(pendiente.dueDate).toLocaleDateString('es-AR')}
+                            {new Date(pendiente.dueDate + 'T00:00:00').toLocaleDateString('es-AR')}
                           </span>
                         )}
                         {pendiente.completed && pendiente.completedAt && (
                           <span className={`flex items-center gap-1 ${
                             darkMode ? 'text-green-400' : 'text-green-600'
                           }`}>
-                            ✓ {new Date(pendiente.completedAt).toLocaleDateString('es-AR')}
+                            ✓ {new Date(pendiente.completedAt + 'T00:00:00').toLocaleDateString('es-AR')}
                           </span>
                         )}
                       </div>

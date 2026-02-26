@@ -3,10 +3,10 @@ import { useCalendar } from '../hooks/useCalendar';
 import { formatMonth, isToday } from '../utils/dateUtils';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useEffect } from 'react';
-
+  
 const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-export default function Calendar({ darkMode, appointmentsPerDay, birthdaysPerDay, onSelectDay, onMonthChange }) {
+export default function Calendar({ darkMode, appointmentsPerDay, birthdaysPerDay, pendientesPerDay, onSelectDay, onMonthChange }) {
   const { currentDate, days, goToNextMonth, goToPreviousMonth, goToToday, getDateForDay } = useCalendar();
 
   useEffect(() => {
@@ -67,8 +67,10 @@ export default function Calendar({ darkMode, appointmentsPerDay, birthdaysPerDay
           const isCurrentDay = day && isToday(getDateForDay(day));
           const hasAppointments = day && (appointmentsPerDay[day]?.length || 0) > 0;
           const hasBirthdays = day && (birthdaysPerDay[day]?.length || 0) > 0;
+          const hasPendientes = day && (pendientesPerDay[day]?.length || 0) > 0;
           const appointmentCount = day ? (appointmentsPerDay[day]?.length || 0) : 0;
           const birthdayCount = day ? (birthdaysPerDay[day]?.length || 0) : 0;
+          const pendientesCount = day ? (pendientesPerDay[day]?.length || 0) : 0;
 
           return (
             <div
@@ -84,7 +86,7 @@ export default function Calendar({ darkMode, appointmentsPerDay, birthdaysPerDay
                     : darkMode
                       ? 'bg-slate-700 hover:bg-slate-600'
                       : 'bg-gray-100 hover:bg-gray-200'
-              } ${hasAppointments ? (darkMode ? 'ring-2 ring-green-500' : 'ring-2 ring-green-400') : ''} ${hasBirthdays && !hasAppointments ? (darkMode ? 'ring-2 ring-pink-500' : 'ring-2 ring-pink-400') : ''}`}
+              } ${hasAppointments ? (darkMode ? 'ring-2 ring-green-500' : 'ring-2 ring-green-400') : ''} ${hasBirthdays && !hasAppointments ? (darkMode ? 'ring-2 ring-pink-500' : 'ring-2 ring-pink-400') : ''} ${hasPendientes && !hasAppointments && !hasBirthdays ? (darkMode ? 'ring-2 ring-red-500' : 'ring-2 ring-red-400') : ''}`}
             >
               <div className={`font-semibold text-sm ${isCurrentDay ? 'text-white' : darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 {day}
@@ -103,6 +105,13 @@ export default function Calendar({ darkMode, appointmentsPerDay, birthdaysPerDay
                   🎂 {birthdayCount} cumple{birthdayCount > 1 ? 's' : ''}
                 </div>
               )}
+              
+              {/* Indicador de pendientes de prioridad alta */}
+              {hasPendientes && (
+                <div className={`text-xs mt-1 ${isCurrentDay ? 'text-red-100' : darkMode ? 'text-red-400' : 'text-red-600'}`}>
+                  ⚠️ {pendientesCount} urgente{pendientesCount > 1 ? 's' : ''}
+                </div>
+              )}
             </div>
           );
         })}
@@ -117,6 +126,10 @@ export default function Calendar({ darkMode, appointmentsPerDay, birthdaysPerDay
         <div className="flex items-center gap-1">
           <div className={`w-3 h-3 rounded ${darkMode ? 'bg-pink-500' : 'bg-pink-400'}`}></div>
           <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Cumpleaños</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <div className={`w-3 h-3 rounded ${darkMode ? 'bg-red-500' : 'bg-red-400'}`}></div>
+          <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Pendientes urgentes</span>
         </div>
         <div className="flex items-center gap-1">
           <div className={`w-3 h-3 rounded ${darkMode ? 'bg-blue-600' : 'bg-blue-500'}`}></div>

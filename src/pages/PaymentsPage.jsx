@@ -55,8 +55,17 @@ export default function PaymentsPage({ darkMode }) {
     }
 
     if (filterStatus !== 'todos') {
-      const isPaid = filterStatus === 'pagados';
-      filtered = filtered.filter((apt) => apt.paid === isPaid);
+      if (filterStatus === 'particulares') {
+        // Filtrar solo pacientes particulares (que tienen 'particular', 'part', etc. en obra social)
+        filtered = filtered.filter((apt) => {
+          if (!apt.insurance) return false;
+          const insuranceLower = apt.insurance.toLowerCase();
+          return insuranceLower.includes('part');
+        });
+      } else {
+        const isPaid = filterStatus === 'pagados';
+        filtered = filtered.filter((apt) => apt.paid === isPaid);
+      }
     }
 
     if (filterPaymentMethod !== 'todos') {
@@ -217,6 +226,7 @@ export default function PaymentsPage({ darkMode }) {
               <option value="todos">Todos</option>
               <option value="pagados">Pagados</option>
               <option value="pendientes">Pendientes</option>
+              <option value="particulares">👤 Particulares</option>
             </select>
           </div>
 

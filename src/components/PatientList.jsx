@@ -1,14 +1,17 @@
 // src/components/PatientList.jsx
 import { useState } from 'react';
-import { FiTrash2, FiEdit2, FiSearch, FiPlus, FiCalendar } from 'react-icons/fi';
+import { FiTrash2, FiEdit2, FiSearch, FiPlus, FiCalendar, FiArchive, FiRefreshCw } from 'react-icons/fi';
 
 export default function PatientList({
   darkMode,
   patients,
   onEdit,
   onDelete,
+  onArchive,
+  onUnarchive,
   onViewAppointments,
   onViewAnnualCalendar,
+  showArchived = false,
 }) {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -80,6 +83,11 @@ export default function PatientList({
                         ({patient.age} años)
                       </span>
                     )}
+                    {patient.archived && (
+                      <span className={`ml-2 text-xs px-2 py-1 rounded ${darkMode ? 'bg-orange-900 text-orange-300' : 'bg-orange-100 text-orange-700'}`}>
+                        Archivado
+                      </span>
+                    )}
                   </h3>
                   <div className={`text-sm mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
@@ -98,18 +106,20 @@ export default function PatientList({
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 ml-4">
-                  <button
-                    onClick={() => onViewAnnualCalendar(patient)}
-                    className={`px-3 py-1 rounded text-sm font-medium transition flex items-center gap-1 ${
-                      darkMode
-                        ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                        : 'bg-purple-500 hover:bg-purple-600 text-white'
-                    }`}
-                    title="Calendario Anual"
-                  >
-                    <FiCalendar size={16} />
-                    Calendario
-                  </button>
+                  {!patient.archived && (
+                    <button
+                      onClick={() => onViewAnnualCalendar(patient)}
+                      className={`px-3 py-1 rounded text-sm font-medium transition flex items-center gap-1 ${
+                        darkMode
+                          ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                          : 'bg-purple-500 hover:bg-purple-600 text-white'
+                      }`}
+                      title="Calendario Anual"
+                    >
+                      <FiCalendar size={16} />
+                      Calendario
+                    </button>
+                  )}
                   <button
                     onClick={() => onEdit(patient)}
                     className={`p-2 rounded transition ${
@@ -117,9 +127,35 @@ export default function PatientList({
                         ? 'bg-slate-600 hover:bg-slate-500 text-white'
                         : 'bg-gray-200 hover:bg-gray-300'
                     }`}
+                    title="Editar"
                   >
                     <FiEdit2 size={18} />
                   </button>
+                  {patient.archived ? (
+                    <button
+                      onClick={() => onUnarchive(patient.id)}
+                      className={`p-2 rounded transition ${
+                        darkMode
+                          ? 'bg-green-600/20 hover:bg-green-600/30 text-green-400'
+                          : 'bg-green-100 hover:bg-green-200 text-green-600'
+                      }`}
+                      title="Desarchivar"
+                    >
+                      <FiRefreshCw size={18} />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => onArchive(patient.id)}
+                      className={`p-2 rounded transition ${
+                        darkMode
+                          ? 'bg-orange-600/20 hover:bg-orange-600/30 text-orange-400'
+                          : 'bg-orange-100 hover:bg-orange-200 text-orange-600'
+                      }`}
+                      title="Archivar"
+                    >
+                      <FiArchive size={18} />
+                    </button>
+                  )}
                   <button
                     onClick={() => onDelete(patient.id)}
                     className={`p-2 rounded transition ${
@@ -127,6 +163,7 @@ export default function PatientList({
                         ? 'bg-red-600/20 hover:bg-red-600/30 text-red-400'
                         : 'bg-red-100 hover:bg-red-200 text-red-600'
                     }`}
+                    title="Eliminar"
                   >
                     <FiTrash2 size={18} />
                   </button>

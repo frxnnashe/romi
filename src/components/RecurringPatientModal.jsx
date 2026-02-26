@@ -117,6 +117,7 @@ export default function RecurringPatientModal({
       patientId: patient.id,
       patientName: patient.name,
       insurance: patient.insurance || '',
+      amount: patient.defaultAmount || '', // Autocompletar monto fijo
     }));
     setSearchTerm(patient.name);
     setShowDropdown(false);
@@ -343,6 +344,11 @@ export default function RecurringPatientModal({
                     : 'bg-white border-gray-300 text-gray-900'
                 }`}
               />
+              {formData.patientId && formData.amount && (
+                <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  💡 Monto autocompletado desde el perfil del paciente
+                </p>
+              )}
             </div>
           </div>
 

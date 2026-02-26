@@ -221,7 +221,7 @@ export default function TherapeuticToolsPage({ darkMode }) {
                         darkMode ? 'bg-blue-900 text-blue-300' : 'bg-blue-100 text-blue-700'
                       }`}>
                         <FiCalendar size={12} />
-                        {new Date(session.date).toLocaleDateString('es-AR')}
+                        {new Date(session.date + 'T00:00:00').toLocaleDateString('es-AR')}
                       </span>
                     </div>
                     
